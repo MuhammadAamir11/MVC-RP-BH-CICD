@@ -1,0 +1,92 @@
+#cloud-config
+
+# ============================================
+# runcmd: Executes shell commands at first boot
+# ============================================
+
+runcmd:
+  # Register Microsoft package repository for .NET
+  - wget -q https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+  - dpkg -i packages-microsoft-prod.deb
+  - apt-get update
+
+  # Install .NET 9 SDK and ASP.NET Core Runtime
+  - apt-get install -y dotnet-sdk-9.0 aspnetcore-runtime-9.0
+
+  # Create deployment directory for the app
+  - mkdir -p /opt/BasicMVC
+  - chown -R www-data:www-data /opt/BasicMVC
+
+  # Wait briefly to ensure write_files has completed
+  - sleep 10
+
+  # Reload systemd to pick up the new service
+  - systemctl daemon-reload
+
+  # Enable and start the ASP.NET Core systemd service
+  - systemctl enable BasicMVC.service
+  - systemctl start BasicMVC.service
+
+  # ==========================
+  # Logging and Verification
+  # ==========================
+
+  # Log installed .NET SDKs
+  - echo "--- .NET SDKs Installed ---" >> /var/log/cloud-init-success.log
+  - dotnet --list-sdks >> /var/log/cloud-init-success.log 2>&1
+
+  # Log installed runtimes
+  - echo "--- .NET Runtimes Installed ---" >> /var/log/cloud-init-success.log
+  - dotnet --list-runtimes >> /var/log/cloud-init-success.log 2>&1
+
+  # Log status of the BasicMVC service
+  - echo "--- BasicMVC.service Status ---" >> /var/log/cloud-init-success.log
+  - systemctl is-enabled BasicMVC.service >> /var/log/cloud-init-success.log 2>&1
+  - systemctl status BasicMVC.service >> /var/log/cloud-init-success.log 2>&1
+
+  # Final success message
+  - echo "Cloud-init completed successfully at $(date)" >> /var/log/cloud-init-success.log
+
+# ============================================
+# write_files: Define custom files to be written
+# ============================================
+
+write_files:
+  # Define the systemd service for your ASP.NET Core app
+  - path: /etc/systemd/system/BasicMVC.service
+    content: |
+      [Unit]
+      Description=ASP.NET Core Web Application Service
+
+      [Service]
+      WorkingDirectory=/opt/BasicMVC
+      ExecStart=/usr/bin/dotnet /opt/BasicMVC/basicmvc.dll
+      Restart=always
+      RestartSec=10
+      KillSignal=SIGINT
+      SyslogIdentifier=BasicMVC
+      User=www-data
+      EnvironmentFile=/etc/BasicMVC.env
+
+      [Install]
+      WantedBy=multi-user.target
+    owner: root:root
+    permissions: '0644'
+
+  # Environment variables used by the .NET Core app
+  - path: /etc/BasicMVC.env
+    content: |
+      ASPNETCORE_ENVIRONMENT=Production
+      DOTNET_PRINT_TELEMETRY_MESSAGE=false
+      ASPNETCORE_URLS=http://+:5000
+    owner: root:root
+    permissions: '0644'
+
+# ============================================
+# systemd: Enables the service on boot
+# ============================================
+
+systemd:
+  units:
+    - name: BasicMVC.service
+      enabled: true
