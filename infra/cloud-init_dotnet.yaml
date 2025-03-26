@@ -1,5 +1,8 @@
 #cloud-config
 
+# For CICD we have REMOVED:systemctl start BasicMVC.service - Don't start the service  — CI/CD will copy the app and start it
+  # - systemctl start BasicMVC.service
+
 # ============================================
 # runcmd: Executes shell commands at first boot
 # ============================================
@@ -13,38 +16,34 @@ runcmd:
   # Install .NET 9 SDK and ASP.NET Core Runtime
   - apt-get install -y dotnet-sdk-9.0 aspnetcore-runtime-9.0
 
-  # Create deployment directory for the app
+  # Create deployment directory (CI/CD will copy app files later)
   - mkdir -p /opt/BasicMVC
   - chown -R www-data:www-data /opt/BasicMVC
 
   # Wait briefly to ensure write_files has completed
   - sleep 10
 
-  # Reload systemd to pick up the new service
+  # Reload systemd to register the service file defined below
   - systemctl daemon-reload
 
-  # Enable and start the ASP.NET Core systemd service
+  #  KEEP: Enable the service so it starts on reboot
   - systemctl enable BasicMVC.service
-  - systemctl start BasicMVC.service
+  # - systemctl start BasicMVC.service
 
   # ==========================
   # Logging and Verification
   # ==========================
 
-  # Log installed .NET SDKs
   - echo "--- .NET SDKs Installed ---" >> /var/log/cloud-init-success.log
   - dotnet --list-sdks >> /var/log/cloud-init-success.log 2>&1
 
-  # Log installed runtimes
   - echo "--- .NET Runtimes Installed ---" >> /var/log/cloud-init-success.log
   - dotnet --list-runtimes >> /var/log/cloud-init-success.log 2>&1
 
-  # Log status of the BasicMVC service
   - echo "--- BasicMVC.service Status ---" >> /var/log/cloud-init-success.log
   - systemctl is-enabled BasicMVC.service >> /var/log/cloud-init-success.log 2>&1
-  - systemctl status BasicMVC.service >> /var/log/cloud-init-success.log 2>&1
 
-  # Final success message
+  #  Final status message for confirmation
   - echo "Cloud-init completed successfully at $(date)" >> /var/log/cloud-init-success.log
 
 # ============================================
@@ -52,7 +51,7 @@ runcmd:
 # ============================================
 
 write_files:
-  # Define the systemd service for your ASP.NET Core app
+  #  Systemd service file to control ASP.NET Core app
   - path: /etc/systemd/system/BasicMVC.service
     content: |
       [Unit]
@@ -74,7 +73,7 @@ write_files:
     owner: root:root
     permissions: '0644'
 
-  # Environment variables used by the .NET Core app
+  # ✅ Environment variables required by the app
   - path: /etc/BasicMVC.env
     content: |
       ASPNETCORE_ENVIRONMENT=Production

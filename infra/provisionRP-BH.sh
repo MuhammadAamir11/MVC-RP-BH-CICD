@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# For CICD we will remove dotnet publish "$project_path" -c Release -o "$publish_dir"
+
+
 # 🌍 Provision ASP.NET App VM + NGINX Reverse Proxy with Clean Architecture (No HTTPS)
 
 # 🧠 Step 1: Environment Setup
@@ -250,6 +253,9 @@ sleep 5
 # Upload build
 scp -o StrictHostKeyChecking=no -P 2222 -r "$publish_dir"/* $admin_user@localhost:/home/$admin_user/
 
+# Confirm upload is done
+echo "✅ Build files uploaded to App VM via SSH tunnel"
+
 # Move + restart service
 ssh -o StrictHostKeyChecking=no -p 2222 $admin_user@localhost << EOF
   sudo mv /home/$admin_user/* "$remote_dir"/
@@ -273,4 +279,5 @@ echo "- Cloud-init for automated provisioning"
 echo "- File upload via SSH tunnel through Bastion"
 echo "- Old SSH tunnels killed to prevent port conflicts"
 echo "- Known_hosts cleaned to avoid SSH verification prompts"
-echo "- CICD implementwed with dotnet publish and cloud-init"
+echo "- CI/CD handled by GitHub Actions; this script provisions infrastructure only"
+echo "- App hosted using systemd, not dotnet run (suitable for production)"
