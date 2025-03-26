@@ -280,4 +280,4 @@ echo "- File upload via SSH tunnel through Bastion"
 echo "- Old SSH tunnels killed to prevent port conflicts"
 echo "- Known_hosts cleaned to avoid SSH verification prompts"
 echo "- CI/CD handled by GitHub Actions; this script provisions infrastructure only"
-echo "- App hosted using systemd, not dotnet run (suitable for production)"
+
