@@ -1,60 +1,66 @@
-# This workflow will build the GithubActionsDemo project
+# ASP.NET CI/CD Pipeline for basicMVC App
 
-name: GithubActionsDemo
+name: CICD
 
 on:
   push:
     branches:
-    - "CICD-pipeline"
-  workflow_dispatch:
+      - "cicd"  # Triggers the workflow when pushing to this branch
+  workflow_dispatch:  # Allows manual execution from GitHub
+
+env:
+  APP_NAME: basicMVC         # Used for service and folder names
+  PUBLISH_DIR: ./publish      # Output folder for published app
 
 jobs:
   build:
+    name: Build and Publish
     runs-on: ubuntu-latest
+
     steps:
+      - name: Check out code
+        uses: actions/checkout@v4
 
-    - name: Install .NET SDK
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '9.0.x'
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
 
-    - name: Check out this repo
-      uses: actions/checkout@v4
+      - name: Restore dependencies
+        run: dotnet restore
 
-    - name: Restore dependencies (install Nuget packages)
-      run: dotnet restore
+      - name: Build and Publish
+        run: |
+          dotnet build --no-restore
+          dotnet publish -c Release -o ${{ env.PUBLISH_DIR }}
 
-    - name: Build and publish the app
-      run: |
-        dotnet build --no-restore
-        dotnet publish -c Release -o ./publish        
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-artifacts
+          path: ${{ env.PUBLISH_DIR }}
 
-    - name: Upload app artifacts to Github
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-artifacts
-        path: ./publish
-  
-  
   deploy:
+    name: Deploy to Azure VM
     runs-on: self-hosted
     needs: build
 
     steps:
-    - name: Download the artifacts from Github (from the build job)
-      uses: actions/download-artifact@v4
-      with:
-        name: app-artifacts
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: app-artifacts
 
-    - name: Stop the application service
-      run: |
-        sudo systemctl stop CloudSoft.service        
+      - name: Stop App Service
+        run: |
+          sudo systemctl stop ${{ env.APP_NAME }}.service
 
-    - name: Deploy the the application
-      run: |
-        sudo rm -Rf /opt/CloudSoft || true
-        sudo cp -r /home/azureuser/actions-runner/_work/CloudSoft/CloudSoft/ /opt/CloudSoft        
+      - name: Replace Existing Deployment
+        run: |
+          sudo rm -rf /opt/${{ env.APP_NAME }} || true
+          sudo mkdir -p /opt/${{ env.APP_NAME }}
+          sudo cp -r . /opt/${{ env.APP_NAME }}
 
-    - name: Start the application service
-      run: |
-        sudo systemctl start CloudSoft.service        
+      - name: Restart App Service
+        run: |
+          sudo systemctl start ${{ env.APP_NAME }}.service
