@@ -9,7 +9,7 @@ on:
   workflow_dispatch:  # Allows manual execution from GitHub
 
 env:
-  APP_NAME: BasicMVC         # Used for service and folder names
+  APP_NAME: basicMVC         # Used for service and folder names
   PUBLISH_DIR: /tmp/BasicMVC_publish      # Output folder for published app
 
 jobs:

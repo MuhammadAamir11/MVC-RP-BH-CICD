@@ -15,11 +15,11 @@ runcmd:
   - chown -R www-data:www-data /opt/BasicMVC
   - sleep 5
   - systemctl daemon-reload
-  - systemctl enable BasicMVC.service
+  - systemctl enable basicMVC.service
   - echo "Cloud-init setup complete" >> /var/log/cloud-init-success.log
 
 write_files:
-  - path: /etc/systemd/system/BasicMVC.service
+  - path: /etc/systemd/system/basicMVC.service
     permissions: '0644'
     owner: root:root
     content: |
@@ -29,7 +29,7 @@ write_files:
       [Service]
       WorkingDirectory=/opt/BasicMVC
       Environment=DOTNET_CLI_HOME=/tmp
-      ExecStart=/usr/bin/dotnet /opt/BasicMVC/BasicMVC.dll
+      ExecStart=/usr/bin/dotnet /opt/BasicMVC/basicMVC.dll
       Restart=always
       RestartSec=10
       KillSignal=SIGINT
@@ -50,5 +50,5 @@ write_files:
 
 systemd:
   units:
-    - name: BasicMVC.service
+    - name: basicMVC.service
       enabled: true
