@@ -19,7 +19,7 @@ runcmd:
   - echo "Cloud-init setup complete" >> /var/log/cloud-init-success.log
 
 write_files:
-  - path: /etc/systemd/system/basicMVC.service
+  - path: /etc/systemd/system/BasicMVC.service
     permissions: '0644'
     owner: root:root
     content: |
