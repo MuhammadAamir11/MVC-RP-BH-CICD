@@ -1,7 +1,7 @@
 
 
 1. Dev branch is Reverse Proxy and Bastion Host. Used SCP to copy published folder through BH
-2. CICD is Reverse Proxy and Bastion host with CICD implementation
+2. CICD branch is Reverse Proxy and Bastion host with CICD implementation
 3. Bash script is automated
    
 
