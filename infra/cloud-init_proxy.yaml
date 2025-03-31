@@ -3,7 +3,7 @@
 # This cloud-init config provisions a reverse proxy VM running NGINX
 # It proxies traffic from the public Internet (port 80) to the internal ASP.NET app
 
-# The string '__APP_PRIVATE_IP__' will be replaced dynamically
+# The string '10.0.1.4' will be replaced dynamically
 # by your script to point to the internal private IP of the app VM
 
 package_update: true
@@ -22,7 +22,7 @@ write_files:
           server_tokens off;
 
           location / {
-              proxy_pass http://__APP_PRIVATE_IP__:5000/;  #  Will be replaced with app VMs private IP
+              proxy_pass http://10.0.1.4:5000/;  #  Will be replaced with app VMs private IP
               proxy_http_version 1.1;
               proxy_set_header Upgrade $http_upgrade;
               proxy_set_header Connection keep-alive;
