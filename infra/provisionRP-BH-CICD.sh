@@ -15,10 +15,11 @@ admin_user="azureuser"
 vm_port=5000
 publish_dir="/tmp/BasicMVC_publish"     # ⬅️ Capital 'B' to match service path
 remote_dir="/opt/BasicMVC"
-project_path="/c/Git/AzurePractice/basicMVC/basicmvc.csproj"
+project_path="/c/Git/AzurePractice/BasicMVC/basicmvc.csproj"
 cloud_init_app="cloud-init_dotnet.yaml"
 cloud_init_proxy_template="cloud-init_proxy.template.yaml"
 cloud_init_proxy="cloud-init_proxy.yaml"
+
 
 # Network + Subnets 
 vnet_name="BasicMVCVNet"
