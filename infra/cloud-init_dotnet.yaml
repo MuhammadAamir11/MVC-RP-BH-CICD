@@ -29,7 +29,7 @@ write_files:
       [Service]
       WorkingDirectory=/opt/BasicMVC
       Environment=DOTNET_CLI_HOME=/tmp
-      ExecStart=/usr/bin/dotnet /opt/BasicMVC/basicMVC.dll
+      ExecStart=/usr/bin/dotnet /opt/BasicMVC/basicmvc.dll
       Restart=always
       RestartSec=10
       KillSignal=SIGINT
