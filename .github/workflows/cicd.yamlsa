@@ -2,80 +2,67 @@
 
 name: CICD
 
-# Trigger conditions
 on:
   push:
     branches:
-      - "cicd"  # Trigger when pushing to 'cicd' branch
-  workflow_dispatch:  # Allow manual trigger from GitHub UI
+      - "cicd"  # Triggers the workflow when pushing to this branch
+  workflow_dispatch:  # Allows manual execution from GitHub
 
-# Global environment variables
 env:
-  APP_NAME: basicMVC                      # Name of your app/service
-  PUBLISH_DIR: /tmp/BasicMVC_publish      # Directory where build output will be published
+  APP_NAME: basicMVC         # Used for service and folder names
+  PUBLISH_DIR: /tmp/BasicMVC_publish      # Output folder for published app
 
-# Job 1: Build and publish the application
 jobs:
   build:
     name: Build and Publish
-    runs-on: ubuntu-latest  # GitHub-hosted runner
+    runs-on: ubuntu-latest
 
     steps:
-      # Check out source code
       - name: Check out code
         uses: actions/checkout@v4
 
-      # Setup .NET SDK
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
 
-      # Restore dependencies
       - name: Restore dependencies
         run: dotnet restore
 
-      # Build and publish the app
       - name: Build and Publish
         run: |
           dotnet build --no-restore
           dotnet publish -c Release -o ${{ env.PUBLISH_DIR }}
 
-      # Upload the published app as an artifact
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: app-artifacts
           path: ${{ env.PUBLISH_DIR }}
 
-# Job 2: Deploy to Azure VM using self-hosted runner
   deploy:
     name: Deploy to Azure VM
-    runs-on: self-hosted  # Runs on your VM with GitHub self-hosted runner
-    needs: build          # Wait for 'build' job to finish
+    runs-on: self-hosted
+    needs: build
 
     steps:
-      # Download published app from GitHub
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
           name: app-artifacts
-          path: ./publish
 
-      # Stop the currently running app service (ignore if it fails)
       - name: Stop App Service
         run: |
-          sudo systemctl stop ${{ env.APP_NAME }}.service || true
+          sudo systemctl stop ${{ env.APP_NAME }}.service
 
-      # Replace existing app deployment
       - name: Replace Existing Deployment
         run: |
+          sudo systemctl stop ${{ env.APP_NAME }}.service || true
           sudo rm -rf /opt/${{ env.APP_NAME }} || true
           sudo mkdir -p /opt/${{ env.APP_NAME }}
           sudo cp -r ${{ github.workspace }}/publish/* /opt/${{ env.APP_NAME }}
           sudo chown -R www-data:www-data /opt/${{ env.APP_NAME }}
 
-      # Restart the app service
       - name: Restart App Service
         run: |
           sudo systemctl daemon-reexec
