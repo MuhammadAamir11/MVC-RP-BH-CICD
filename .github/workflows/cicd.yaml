@@ -60,7 +60,7 @@ jobs:
           sudo systemctl stop ${{ env.APP_NAME }}.service || true
           sudo rm -rf /opt/${{ env.APP_NAME }} || true
           sudo mkdir -p /opt/${{ env.APP_NAME }}
-          sudo cp -r . /opt/${{ env.APP_NAME }}
+          sudo cp -r ${{ github.workspace }}/publish/* /opt/${{ env.APP_NAME }}
           sudo chown -R www-data:www-data /opt/${{ env.APP_NAME }}
 
       - name: Restart App Service
