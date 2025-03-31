@@ -20,7 +20,7 @@ cloud_init_app="cloud-init_dotnet.yaml"
 cloud_init_proxy_template="cloud-init_proxy.template.yaml"
 cloud_init_proxy="cloud-init_proxy.yaml"
 
-# Network + Subnets
+# Network + Subnets 
 vnet_name="BasicMVCVNet"
 app_subnet="AppSubnet"
 proxy_subnet="ProxySubnet"
