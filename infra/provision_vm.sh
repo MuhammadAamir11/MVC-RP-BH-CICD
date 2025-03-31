@@ -39,6 +39,7 @@ az vm open-port \
     --name $vm_name \
     --priority 1001
 
+
 # Get Public IP
 echo "[INFO] Fetching public IP address of the VM..."
 public_ip=$(az vm show -d -g $resource_group -n $vm_name --query publicIps -o tsv)
