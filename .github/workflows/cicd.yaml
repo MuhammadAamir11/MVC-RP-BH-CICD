@@ -11,7 +11,7 @@ on:
 
 # Global environment variables
 env:
-  APP_NAME: basicMVC                      # Name of your app/service
+  APP_NAME: BasicMVC                      # Name of your app/service
   PUBLISH_DIR: /tmp/BasicMVC_publish      # Directory where build output will be published
 
 # Job 1: Build and publish the application
