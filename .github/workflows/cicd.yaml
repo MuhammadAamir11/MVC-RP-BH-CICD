@@ -84,5 +84,5 @@ jobs:
       - name: Restart App Service
         run: |
           sudo systemctl daemon-reexec
-          sudo systemctl start ${{ env.APP_NAME }}.service
-          sudo systemctl status ${{ env.APP_NAME }}.service --no-pager
+          sudo systemctl start basicMVC.service
+          sudo systemctl status basicmvc.service --no-pager
