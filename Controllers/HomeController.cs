@@ -20,7 +20,7 @@ public class HomeController : Controller
 
      public IActionResult BlobStorage()
     {
-        string imageUrl = "https://demojjsajk22.blob.core.windows.net/image/hero.jpeg";
+        string imageUrl = "https://blobstorage2346.blob.core.windows.net/hero/hero.jpg";
         return View(model: imageUrl);
     }
 
